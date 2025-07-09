@@ -1,37 +1,161 @@
 <html lang="en">
   <head>
+    <meta charset="UTF-8" />
     <title>Join | With Jesus</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background: linear-gradient(135deg, #f3f4f6, #e0f2f1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      h1 {
+        margin-bottom: 0.5rem;
+        font-size: 1.8rem;
+        color: #333;
+      }
+
+      p.subtitle {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        color: #555;
+      }
+
+      input[type="email"],
+      input[type="password"] {
+        width: 90%;
+        padding: 0.8rem;
+        margin: 0.5rem 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      input[type="email"]:focus,
+      input[type="password"]:focus {
+        border-color: #4b6cb7;
+        outline: none;
+      }
+
+      button[type="submit"] {
+        width: 100%;
+        padding: 0.9rem;
+        background: #4b6cb7;
+        color: white;
+        font-size: 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: background 0.3s;
+      }
+
+      button[type="submit"]:hover {
+        background: #3a539b;
+      }
+
+      .footer-text {
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: #888;
+      }
+
+      .toggle-link {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #4b6cb7;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <h1>Join With Jesus ✉️</h1>
-    <form id="signup-form">
-      <input type="email" id="email" placeholder="Enter your email" required />
-      <button type="submit">Send Magic Link</button>
-    </form>
+    <div class="container">
+      <h1>With Jesus</h1>
+      <p class="subtitle">기록하고, 나누고, 함께 걸어요 🌿</p>
+
+      <!-- Sign Up Form -->
+      <form id="signup-form" style="display: none;">
+        <input type="email" placeholder="Email" id="signup-email" required />
+        <input type="password" placeholder="Password" id="signup-password" required />
+        <button type="submit">Sign Up</button>
+      </form>
+
+      <!-- Login Form -->
+      <form id="login-form">
+        <input type="email" placeholder="Email" id="login-email" required />
+        <input type="password" placeholder="Password" id="login-password" required />
+        <button type="submit">Login</button>
+      </form>
+
+      <div class="toggle-link" id="toggle-form">Don't have an account? Sign Up</div>
+
+      <div class="footer-text">
+        "I can do all this through Him who gives me strength." — Philippians 4:13
+      </div>
+    </div>
 
     <script type="module">
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.3'
-      
-        const supabaseUrl = 'https://vmthbmrxnkatbmtwhtxo.supabase.co'
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdGhibXJ4bmthdGJtdHdodHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5NzM5MTEsImV4cCI6MjA2NzU0OTkxMX0.irH6VBASyG4iTkrRf9Jfk5sV2GTpTQe7WKrsADYR8p0'
-      
-        const supabase = createClient(supabaseUrl, supabaseAnonKey)
-      
-        const form = document.getElementById('signup-form')
-        const emailInput = document.getElementById('email')
-      
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault()
-          const email = emailInput.value
-      
-          const { error } = await supabase.auth.signInWithOtp({ email })
-          if (error) {
-            alert(error.message)
-          } else {
-            alert('✅ Check your email for the magic link!')
-          }
-        })
-      </script>
-      
+      import { supabase } from '../lib/supabaseClient'
+
+      const toggle = document.getElementById('toggle-form');
+      const signupForm = document.getElementById('signup-form');
+      const loginForm = document.getElementById('login-form');
+
+      // ✅ 초기 상태 설정 (Login 보이고, Sign Up 숨김)
+      signupForm.style.display = 'none';
+      loginForm.style.display = 'block';
+      toggle.textContent = "Don't have an account? Sign Up";
+
+      toggle.addEventListener('click', () => {
+        console.log('✅ Toggle clicked!'); // 이거 추가
+        if (signupForm.style.display === 'none' || signupForm.style.display === '') {
+          signupForm.style.display = 'block';
+          loginForm.style.display = 'none';
+          toggle.textContent = 'Already have an account? Login';
+        } else {
+          signupForm.style.display = 'none';
+          loginForm.style.display = 'block';
+          toggle.textContent = "Don't have an account? Sign Up";
+        }
+      });
+
+      // Sign up
+      signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) alert(error.message);
+        else alert('✅ Sign up successful! Please check your email to confirm.');
+      });
+
+      // Login
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) alert(error.message);
+        else location.reload();
+      });
+    </script>
   </body>
 </html>

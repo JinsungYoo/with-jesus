@@ -1,75 +1,96 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
+import { supabase } from '../lib/supabaseClient.js';
+
+let user = undefined;
+
+const { data } = await supabase.auth.getUser();
+user = data.user;
 ---
 
 <header>
 	<nav>
-	  <h2><a href="/">{SITE_TITLE}</a></h2>
-	  <div class="internal-links">
-		<HeaderLink href="/">Home</HeaderLink>
-		<HeaderLink href="/journey">Journey</HeaderLink>
-	  </div>
-	  <div>
-		<button id="logout-btn">Log out</button>
-	  </div>
-	</nav>
-	<script type="module">
-		import { supabase } from '../lib/supabaseClient.js'
-	  
-		document.getElementById('logout-btn').addEventListener('click', async () => {
-		  await supabase.auth.signOut()
-		  location.reload()
-		})
-	  </script>
-  </header>
-  
-  <style>
-	header {
-	  margin: 0;
-	  padding: 0 1em;
-	  background: white;
-	  box-shadow: 0 2px 8px rgba(var(--black), 5%);
-	}
-	h2 {
-	  margin: 0;
-	  font-size: 1em;
-	  position: absolute;
-	  left: 1em;
-	}
-	h2 a,
-	h2 a.active {
-	  text-decoration: none;
+		<div class="left-logo">
+		  <h2><a href="/">{SITE_TITLE}</a></h2>
+		</div>
+		<div class="center-links">
+		  <HeaderLink href="/">Home</HeaderLink>
+		  <HeaderLink href="/journey">Journey</HeaderLink>
+		</div>
+		<div class="right-links">
+		  {user 
+			? <button id="logout-btn" class="nav-btn">Log out</button> 
+			: <button id="login-btn" class="nav-btn">Login</button>}
+		</div>
+	  </nav>
+
+  <script type="module">
+    import { supabase } from '../lib/supabaseClient.js'
+
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        window.location.href = '/join';
+      });
+    }
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        location.reload();
+      });
+    }
+  </script>
+</header>
+
+<style>
+  header {
+	margin: 0;
+	padding: 0 1em;
+	background: white;
+	box-shadow: 0 2px 8px rgba(var(--black), 5%);
 	}
 	nav {
-	  display: flex;
-	  align-items: center;
-	  justify-content: center;
-	  position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	}
-	.internal-links {
-	  display: flex;
-	  gap: 1rem;
-	  margin: 0 auto;
+	.left-logo h2 {
+	margin: 0;
+	font-size: 1em;
 	}
-	nav a {
-	  padding: 1em 0.5em;
-	  color: var(--black);
-	  border-bottom: 4px solid transparent;
-	  text-decoration: none;
+	.left-logo a {
+	text-decoration: none;
+	color: var(--black);
 	}
-	nav a.active {
-	  text-decoration: none;
-	  border-bottom-color: var(--accent);
+	.center-links {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+	flex: 1;
 	}
-	.social-links,
-	.social-links a {
-	  display: flex;
+	.right-links {
+	display: flex;
 	}
-	@media (max-width: 720px) {
-	  .social-links {
-		display: none;
-	  }
+	nav a,
+	.nav-btn {
+	padding: 1em 0.5em;
+	color: var(--black);
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	border-bottom: 4px solid transparent;
+	font: inherit;
+	text-decoration: none;
+	transition: border-color 0.2s;
 	}
-  </style>
-  
+	nav a.active,
+	.nav-btn.active,
+	nav a:hover,
+	.nav-btn:hover {
+	border-bottom-color: var(--accent);
+	}
+
+</style>
