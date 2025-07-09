@@ -1,49 +1,46 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
-import { supabase } from '../lib/supabaseClient.js';
-
-let user = undefined;
-
-const { data } = await supabase.auth.getUser();
-user = data.user;
 ---
 
 <header>
-	<nav>
-		<div class="left-logo">
-		  <h2><a href="/">{SITE_TITLE}</a></h2>
-		</div>
-		<div class="center-links">
-		  <HeaderLink href="/">Home</HeaderLink>
-		  <HeaderLink href="/journey">Journey</HeaderLink>
-		</div>
-		<div class="right-links">
-		  {user 
-			? <button id="logout-btn" class="nav-btn">Log out</button> 
-			: <button id="login-btn" class="nav-btn">Login</button>}
-		</div>
-	  </nav>
+  <nav>
+    <h2><a href="/">{SITE_TITLE}</a></h2>
+    <div class="internal-links">
+      <HeaderLink href="/">Home</HeaderLink>
+      <HeaderLink href="/journey">Journey</HeaderLink>
+    </div>
+    <div id="auth-area">
+      <!-- 여기에 나중에 JS로 로그인/로그아웃 버튼 삽입 -->
+    </div>
+  </nav>
 
   <script type="module">
-    import { supabase } from '../lib/supabaseClient.js'
+    import { supabase } from '../lib/supabaseClient.js';
 
-    const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        window.location.href = '/join';
-      });
+    async function checkUser() {
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      const authArea = document.getElementById('auth-area');
+
+      if (user) {
+        authArea.innerHTML = `<button id="logout-btn">Log out</button>`;
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+          await supabase.auth.signOut();
+          location.reload();
+        });
+      } else {
+        authArea.innerHTML = `<button id="login-btn">Login</button>`;
+        document.getElementById('login-btn').addEventListener('click', () => {
+          window.location.href = '/join';
+        });
+      }
     }
 
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', async () => {
-        await supabase.auth.signOut();
-        location.reload();
-      });
-    }
+    checkUser();
   </script>
 </header>
+
 
 <style>
   header {
