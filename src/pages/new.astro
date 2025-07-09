@@ -1,7 +1,7 @@
 ---
 import { supabase } from '../lib/supabaseClient'
 
-const siteUrl = import.meta.env.PUBLIC_SITE_URL
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://seorosaranghara.com';
 
 return Response.redirect(`${siteUrl}/join`, 302)
 ---
