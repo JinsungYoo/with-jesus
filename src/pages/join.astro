@@ -1,0 +1,37 @@
+<html lang="en">
+  <head>
+    <title>Join | With Jesus</title>
+  </head>
+  <body>
+    <h1>Join With Jesus ✉️</h1>
+    <form id="signup-form">
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <button type="submit">Send Magic Link</button>
+    </form>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.3'
+      
+        const supabaseUrl = 'https://vmthbmrxnkatbmtwhtxo.supabase.co'
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdGhibXJ4bmthdGJtdHdodHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5NzM5MTEsImV4cCI6MjA2NzU0OTkxMX0.irH6VBASyG4iTkrRf9Jfk5sV2GTpTQe7WKrsADYR8p0'
+      
+        const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      
+        const form = document.getElementById('signup-form')
+        const emailInput = document.getElementById('email')
+      
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          const email = emailInput.value
+      
+          const { error } = await supabase.auth.signInWithOtp({ email })
+          if (error) {
+            alert(error.message)
+          } else {
+            alert('✅ Check your email for the magic link!')
+          }
+        })
+      </script>
+      
+  </body>
+</html>

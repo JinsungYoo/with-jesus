@@ -1,0 +1,99 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      main {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      li {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border: 1px solid #eee;
+        padding: 0.8rem;
+        border-radius: 8px;
+        transition: background 0.2s ease;
+      }
+      li:hover {
+        background: #f9f9f9;
+      }
+      img {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+      }
+      .info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	  }
+
+      .info h4 {
+        margin: 0;
+		margin-left: 20px;
+        font-size: 1.1rem;
+      }
+	  .meta {
+		margin-top: auto;
+		text-align: right;
+		color: #555;
+		font-size: 0.9rem;
+	  }
+      a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h1>📚 Journey Posts</h1>
+      <ul>
+        {
+          posts.map((post) => (
+            <li>
+              <a href={`/journey/${post.id}/`}>
+                <img src={post.data.heroImage} alt="" />
+                <div class="info">
+                  <h4>{post.data.title}</h4>
+                  <p class="meta">by {post.data.author ?? 'Unknown'} • <FormattedDate date={post.data.pubDate} /></p>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </main>
+    <Footer />
+  </body>
+</html>
