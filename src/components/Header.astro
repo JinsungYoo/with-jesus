@@ -5,14 +5,14 @@ import { SITE_TITLE } from '../consts';
 
 <header>
   <nav>
-    <h2><a href="/">{SITE_TITLE}</a></h2>
-    <div class="internal-links">
+    <div class="left-logo">
+      <h2><a href="/">{SITE_TITLE}</a></h2>
+    </div>
+    <div class="center-links">
       <HeaderLink href="/">Home</HeaderLink>
       <HeaderLink href="/journey">Journey</HeaderLink>
     </div>
-    <div id="auth-area">
-      <!-- 여기에 나중에 JS로 로그인/로그아웃 버튼 삽입 -->
-    </div>
+    <div id="auth-area" class="right-links"></div>
   </nav>
 
   <script type="module">
@@ -24,13 +24,13 @@ import { SITE_TITLE } from '../consts';
       const authArea = document.getElementById('auth-area');
 
       if (user) {
-        authArea.innerHTML = `<button id="logout-btn">Log out</button>`;
+        authArea.innerHTML = `<button class="nav-btn" id="logout-btn">Log out</button>`;
         document.getElementById('logout-btn').addEventListener('click', async () => {
           await supabase.auth.signOut();
           location.reload();
         });
       } else {
-        authArea.innerHTML = `<button id="login-btn">Login</button>`;
+        authArea.innerHTML = `<button class="nav-btn" id="login-btn">Login</button>`;
         document.getElementById('login-btn').addEventListener('click', () => {
           window.location.href = '/join';
         });
@@ -41,53 +41,58 @@ import { SITE_TITLE } from '../consts';
   </script>
 </header>
 
-
 <style>
   header {
-	margin: 0;
-	padding: 0 1em;
-	background: white;
-	box-shadow: 0 2px 8px rgba(var(--black), 5%);
-	}
-	nav {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	}
-	.left-logo h2 {
-	margin: 0;
-	font-size: 1em;
-	}
-	.left-logo a {
+    margin: 0;
+    padding: 0 1em;
+    background: white;
+    box-shadow: 0 2px 8px rgba(var(--black), 5%);
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .left-logo h2 {
+    margin: 0;
+    font-size: 1em;
+  }
+  .left-logo a {
 	text-decoration: none;
 	color: var(--black);
-	}
-	.center-links {
-	display: flex;
-	gap: 1rem;
-	justify-content: center;
-	flex: 1;
-	}
-	.right-links {
-	display: flex;
-	}
-	nav a,
-	.nav-btn {
-	padding: 1em 0.5em;
-	color: var(--black);
-	background: transparent;
-	border: none;
-	cursor: pointer;
-	border-bottom: 4px solid transparent;
-	font: inherit;
-	text-decoration: none;
-	transition: border-color 0.2s;
-	}
-	nav a.active,
-	.nav-btn.active,
-	nav a:hover,
-	.nav-btn:hover {
-	border-bottom-color: var(--accent);
+	border-bottom: none; /* 혹시라도 기본 밑줄 제거 */
+	pointer-events: auto;
 	}
 
+	.left-logo a:hover {
+	border-bottom: none;
+	}
+  .center-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex: 1;
+	margin-left: -100px;
+  }
+  .right-links {
+    display: flex;
+  }
+  .center-links a,
+  .nav-btn {
+    padding: 1em 0.5em;
+    color: var(--black);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-bottom: 4px solid transparent;
+    font: inherit;
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+  .center-links a.active,
+  .nav-btn.active,
+  .center-links a:hover,
+  .nav-btn:hover {
+    border-bottom-color: var(--accent);
+  }
 </style>
