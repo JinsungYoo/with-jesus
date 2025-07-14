@@ -1,4 +1,7 @@
 ---
+import { redirect } from 'astro/runtime/server';
+redirect('/maintenance', 307);
+
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
