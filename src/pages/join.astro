@@ -1,3 +1,6 @@
+---
+import { SITE_TITLE } from '../consts';
+---
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -13,7 +16,6 @@
         align-items: center;
         height: 100vh;
       }
-
       .container {
         background: white;
         padding: 2.5rem 2rem;
@@ -23,20 +25,6 @@
         width: 100%;
         max-width: 400px;
       }
-
-      h1 {
-        margin-bottom: 0.5rem;
-        font-size: 2rem;
-        color: #333;
-      }
-
-      p.subtitle {
-        margin-top: 0;
-        margin-bottom: 1.5rem;
-        font-size: 1rem;
-        color: #666;
-      }
-
       input {
         width: 90%;
         padding: 0.9rem;
@@ -44,15 +32,7 @@
         border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 1rem;
-        transition: border-color 0.2s, box-shadow 0.2s;
       }
-
-      input:focus {
-        border-color: #4b6cb7;
-        box-shadow: 0 0 5px rgba(75, 108, 183, 0.3);
-        outline: none;
-      }
-
       button[type="submit"] {
         width: 95%;
         padding: 0.9rem;
@@ -63,42 +43,19 @@
         border-radius: 6px;
         cursor: pointer;
         margin-top: 0.8rem;
-        transition: background 0.3s, transform 0.1s;
-      }
-
-      button[type="submit"]:hover {
-        background: #3a539b;
-        transform: translateY(-1px);
-      }
-
-      .toggle-link {
-        margin-top: 1rem;
-        font-size: 0.9rem;
-        color: #4b6cb7;
-      }
-
-      .toggle-link a {
-        color: #4b6cb7;
-        text-decoration: underline;
-      }
-
-      .footer-text {
-        margin-top: 1.8rem;
-        font-size: 0.85rem;
-        color: #999;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>Join With Jesus</h1>
-      <p class="subtitle">기록하고, 나누고, 함께 걸어요 🌿<br>Walk together with Jesus and share your journey.</p>
+      <p class="subtitle">기록하고, 나누고, 함께 걸어요 🌿</p>
 
       <form id="signup-form">
-        <input type="text" placeholder="Display Name" id="signup-name" required />
-        <input type="email" placeholder="Email" id="signup-email" required />
-        <input type="password" placeholder="Password" id="signup-password" required />
-        <input type="password" placeholder="Confirm Password" id="signup-password-confirm" required />
+        <input type="text" id="signup-name" placeholder="Display Name" required />
+        <input type="email" id="signup-email" placeholder="Email" required />
+        <input type="password" id="signup-password" placeholder="Password" required />
+        <input type="password" id="signup-password-confirm" placeholder="Confirm Password" required />
         <button type="submit">Sign Up</button>
       </form>
 
@@ -112,46 +69,42 @@
     </div>
 
     <script type="module">
-      import { supabase } from '../lib/supabaseClient'
-    
-      document.getElementById('signup-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('signup-name').value;
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-        const confirm = document.getElementById('signup-password-confirm').value;
-    
-        if (password !== confirm) {
-          alert("❗ Passwords do not match!");
-          return;
-        }
-    
-        try {
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                display_name: name
-              }
-            }
-          });
-    
-          if (error) {
-            console.error(error);
-            alert(`❗ Sign up failed: ${error.message}`);
-          } else {
-            console.log('✅ Sign up data:', data);
-            alert('✅ Sign up successful! Please check your email to confirm your account.');
-            // 필요하면 가입 후 다른 페이지로 이동
-            // location.href = '/login';
+      import { supabase } from '../lib/supabaseClient.js'; // ✅ 경로 수정 확인!
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('signup-form');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const name = document.getElementById('signup-name').value;
+          const email = document.getElementById('signup-email').value;
+          const password = document.getElementById('signup-password').value;
+          const confirm = document.getElementById('signup-password-confirm').value;
+
+          if (password !== confirm) {
+            alert("❗ Passwords do not match!");
+            return;
           }
-        } catch (err) {
-          console.error('Unexpected error:', err);
-          alert("❗ Unexpected error occurred. Please try again later.");
-        }
+
+          try {
+            const { error } = await supabase.auth.signUp({
+              email,
+              password,
+              options: { data: { display_name: name } }
+            });
+
+            if (error) {
+              alert(`❗ Sign up failed: ${error.message}`);
+            } else {
+              alert('✅ Sign up successful! Please check your email to confirm.');
+            }
+          } catch (err) {
+            alert("❗ Unexpected error occurred.");
+            console.error(err);
+          }
+        });
       });
     </script>
-    
   </body>
 </html>
