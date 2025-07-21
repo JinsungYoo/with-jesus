@@ -69,36 +69,55 @@ import { SITE_TITLE } from '../consts';
     </div>
 
     <script type="module">
-      import { supabase } from '../lib/supabaseClient.js'; // ✅ 경로 수정 확인
-
+      import { supabase } from '../lib/supabaseClient.js';
+    
       document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById('signup-form');
-
+    
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
-
+    
           const name = document.getElementById('signup-name').value;
           const email = document.getElementById('signup-email').value;
           const password = document.getElementById('signup-password').value;
           const confirm = document.getElementById('signup-password-confirm').value;
-
+    
           if (password !== confirm) {
             alert("❗ Passwords do not match!");
             return;
           }
-
+    
           try {
-            const { error } = await supabase.auth.signUp({
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
               email,
               password,
-              options: { data: { display_name: name } },
-              emailRedirectTo: 'https://seorosaranghara.com/confirmed'
+              options: {
+                data: { display_name: name },
+                emailRedirectTo: 'https://seorosaranghara.com/confirmed',
+              }
             });
-
-            if (error) {
-              alert(`❗ Sign up failed: ${error.message}`);
+    
+            if (signUpError) {
+              alert(`❗ Sign up failed: ${signUpError.message}`);
+              return;
+            }
+    
+            const userId = signUpData?.user?.id;
+            if (!userId) {
+              alert("❗ Sign up succeeded but user ID missing.");
+              return;
+            }
+    
+            // ✅ profiles 테이블에 name 저장
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .insert([{ id: userId, name }]);
+    
+            if (profileError) {
+              console.error('❗ Profile insert failed:', profileError.message);
+              alert("⚠️ 계정은 생성되었지만 프로필 저장에 실패했습니다.");
             } else {
-              alert('✅ Sign up successful! Please check your email to confirm.');
+              alert('✅ 회원가입 완료! 이메일을 확인해주세요.');
             }
           } catch (err) {
             alert("❗ Unexpected error occurred.");
@@ -106,6 +125,6 @@ import { SITE_TITLE } from '../consts';
           }
         });
       });
-    </script>
+    </script>    
   </body>
 </html>
