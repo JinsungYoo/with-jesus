@@ -15,28 +15,41 @@ import { SITE_TITLE } from '../consts';
     <div id="auth-area" class="right-links"></div>
   </nav>
 
+  <div id="user-greeting" class="sub-header" style="display: none;"></div>
+
   <script type="module">
     import { supabase } from '../lib/supabaseClient.js';
-
+  
     async function checkUser() {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
       const authArea = document.getElementById('auth-area');
-
+      const userGreeting = document.getElementById('user-greeting');
+  
       if (user) {
-        authArea.innerHTML = `<button class="nav-btn" id="logout-btn">Log out</button>`;
+        const displayName = user.user_metadata?.display_name || "User";
+  
+        authArea.innerHTML = `
+          <button class="logout-btn" id="logout-btn">Log out</button>
+        `;
+        userGreeting.innerHTML = `
+          <span class="user-name">
+            ${displayName}님, <span class="greeting-msg">오늘 하루 어떠셨나요?</span>
+          </span>
+        `;
+        userGreeting.style.display = 'flex';
         document.getElementById('logout-btn').addEventListener('click', async () => {
           await supabase.auth.signOut();
           location.reload();
         });
       } else {
-        authArea.innerHTML = `<button class="nav-btn" id="login-btn">Login</button>`;
+        authArea.innerHTML = `<button class="login-btn" id="login-btn">Login</button>`;
         document.getElementById('login-btn').addEventListener('click', () => {
-          window.location.href = '/join';
+          window.location.href = '/login';
         });
       }
     }
-
+  
     checkUser();
   </script>
 </header>
@@ -46,7 +59,7 @@ import { SITE_TITLE } from '../consts';
     margin: 0;
     padding: 0 1em;
     background: white;
-    box-shadow: 0 2px 8px rgba(var(--black), 5%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   nav {
     display: flex;
@@ -58,25 +71,27 @@ import { SITE_TITLE } from '../consts';
     font-size: 1em;
   }
   .left-logo a {
-	text-decoration: none;
-	color: var(--black);
-	border-bottom: none; /* 혹시라도 기본 밑줄 제거 */
-	pointer-events: auto;
-	}
-
-	.left-logo a:hover {
-	border-bottom: none;
-	}
+    text-decoration: none;
+    color: var(--black);
+    border-bottom: none;
+    pointer-events: auto;
+  }
+  .left-logo a:hover {
+    border-bottom: none;
+  }
   .center-links {
     display: flex;
     gap: 1rem;
     justify-content: center;
     flex: 1;
-	margin-left: -100px;
+    
   }
   .right-links {
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
+
   .center-links a,
   .nav-btn {
     padding: 1em 0.5em;
@@ -95,4 +110,26 @@ import { SITE_TITLE } from '../consts';
   .nav-btn:hover {
     border-bottom-color: var(--accent);
   }
+
+  .user-name {
+  font-size: 1rem;
+  color: #333;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.sub-header {
+  padding: 0.75em 1em;
+  background-color: #f9f9f9;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  box-shadow: inset 0 -1px 0 #e0e0e0;
+}
+
 </style>

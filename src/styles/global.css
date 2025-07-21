@@ -153,3 +153,47 @@ hr {
   /* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
   white-space: nowrap;
 }
+
+/* src/styles/global.css 등 */
+.logout-btn {
+  background-color: #4b6cb7 !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 0.2em 1em !important;
+  border: none !important;
+  cursor: pointer !important;
+  font: inherit !important;
+  transition: background 0.3s, transform 0.1s !important;
+}
+
+.logout-btn:hover {
+  background-color: #3a539b !important;
+  transform: translateY(-1px) !important;
+}
+
+/* src/styles/global.css 등 */
+.login-btn {
+  background-color: #4b6cb7 !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 0.2em 1em !important;
+  border: none !important;
+  cursor: pointer !important;
+  font: inherit !important;
+  transition: background 0.3s, transform 0.1s !important;
+}
+
+.login-btn:hover {
+  background-color: #3a539b !important;
+  transform: translateY(-1px) !important;
+}
+
+.greeting-msg {
+  display: inline;
+}
+
+@media (max-width: 480px) {
+  .greeting-msg {
+    display: none;
+  }
+}

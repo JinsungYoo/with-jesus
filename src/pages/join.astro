@@ -91,7 +91,8 @@ import { SITE_TITLE } from '../consts';
             const { error } = await supabase.auth.signUp({
               email,
               password,
-              options: { data: { display_name: name } }
+              options: { data: { display_name: name } },
+              emailRedirectTo: 'https://seorosaranghara.com/confirmed'
             });
 
             if (error) {
