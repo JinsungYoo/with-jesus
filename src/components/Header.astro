@@ -34,7 +34,7 @@ import { SITE_TITLE } from '../consts';
         `;
         userGreeting.innerHTML = `
           <span class="user-name">
-            ${displayName}님, <span class="greeting-msg">오늘 하루 어떠셨나요?</span>
+            ${displayName}, <span class="greeting-msg">How are you today?</span>
           </span>
         `;
         userGreeting.style.display = 'flex';
@@ -80,11 +80,11 @@ import { SITE_TITLE } from '../consts';
     border-bottom: none;
   }
   .center-links {
+    font-weight: 700;
     display: flex;
     gap: 1rem;
     justify-content: center;
-    flex: 1;
-    
+    flex: 1;   
   }
   .right-links {
     display: flex;
@@ -94,7 +94,7 @@ import { SITE_TITLE } from '../consts';
 
   .center-links a,
   .nav-btn {
-    padding: 1em 0.5em;
+    padding: 0.5em 0.5em;
     color: var(--black);
     background: transparent;
     border: none;

@@ -30,20 +30,50 @@
   font-style: normal;
   font-display: swap;
 }
-body {
-  font-family: "Atkinson", sans-serif;
+
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
+}
+
+body {
+  font-family: "Atkinson", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  /* 배경 이미지 */
+  background: url('/images/journey-banner.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-color: #f4f4f4; /* 로딩 중 fallback */
+  
+  /* 기타 스타일 */
   text-align: left;
-  background: linear-gradient(var(--gray-gradient)) no-repeat;
-  background-size: 100% 600px;
   word-wrap: break-word;
   overflow-wrap: break-word;
   color: rgb(var(--gray-dark));
   font-size: 20px;
   line-height: 1.7;
+  position: relative;
+  z-index: 0;
 }
+/* 밝은 반투명 오버레이 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.6); /* 반투명 */
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 콘텐츠가 푸터 밀어내도록 설정 */
 main {
+  flex: 1;
   width: 720px;
   max-width: calc(100% - 2em);
   margin: auto;
@@ -156,36 +186,38 @@ hr {
 
 /* src/styles/global.css 등 */
 .logout-btn {
-  background-color: #4b6cb7 !important;
-  color: white !important;
-  border-radius: 8px !important;
-  padding: 0.2em 1em !important;
-  border: none !important;
-  cursor: pointer !important;
-  font: inherit !important;
-  transition: background 0.3s, transform 0.1s !important;
+  padding: 0.5em 0.5em;
+    color: var(--black);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-bottom: 4px solid transparent;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    transition: border-color 0.2s;
 }
 
 .logout-btn:hover {
-  background-color: #3a539b !important;
-  transform: translateY(-1px) !important;
+  border-bottom-color: var(--accent);
 }
 
 /* src/styles/global.css 등 */
 .login-btn {
-  background-color: #4b6cb7 !important;
-  color: white !important;
-  border-radius: 8px !important;
-  padding: 0.2em 1em !important;
-  border: none !important;
-  cursor: pointer !important;
-  font: inherit !important;
-  transition: background 0.3s, transform 0.1s !important;
+  padding: 0.5em 0.5em;
+    color: var(--black);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-bottom: 4px solid transparent;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    transition: border-color 0.2s;
 }
 
 .login-btn:hover {
-  background-color: #3a539b !important;
-  transform: translateY(-1px) !important;
+  border-bottom-color: var(--accent);
 }
 
 .greeting-msg {
@@ -197,3 +229,4 @@ hr {
     display: none;
   }
 }
+
