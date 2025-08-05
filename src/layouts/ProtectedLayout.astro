@@ -1,0 +1,11 @@
+---
+import { createServerSupabaseClient } from '../lib/createServerSupabaseClient'
+
+const supabase = createServerSupabaseClient(Astro.request)
+const { data: { session } } = await supabase.auth.getSession()
+
+if (!session) {
+  return Astro.redirect('/login')
+}
+---
+<slot />

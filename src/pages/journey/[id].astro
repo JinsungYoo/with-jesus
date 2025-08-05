@@ -4,43 +4,51 @@ export const prerender = false;
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { supabase } from '../../lib/supabaseClient.js';
 import FormattedDate from '../../components/FormattedDate.astro';
 
 const { id } = Astro.params;
-
-const { data: post, error } = await supabase
-  .from('posts')
-  .select(`
-    *,
-    profiles (
-      name
-    )
-  `)
-  .eq('id', id)
-  .single();
-
-if (error || !post) {
-  throw new Error('포스트를 찾을 수 없습니다.');
-}
+const { session, post, error } = Astro.props;
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
   <head>
-    <BaseHead title={post.title} description={post.content?.slice(0, 100)} />
+    <BaseHead title={post?.title ?? "로그인이 필요합니다"} description={post?.content?.slice(0, 100) ?? "이 페이지를 보려면 로그인해야 합니다."} />
+    <style>
+      .notice {
+        margin: 4rem auto;
+        padding: 2rem;
+        text-align: center;
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        border-radius: 8px;
+        max-width: 500px;
+        font-size: 1.1rem;
+      }
+    </style>
   </head>
   <body>
     <Header />
     <main style="max-width: 800px; margin: 2rem auto; padding: 1rem;">
-      <h1>{post.title}</h1>
-      <p style="color: #555; font-size: 0.9rem;">
-        by {post.profiles?.name ?? '익명'} • <FormattedDate date={post.created_at} />
-      </p>
-      <img src={post.image_url || '/default.jpg'} alt="썸네일" style="max-width: 100%; margin-top: 1rem; border-radius: 8px;" />
-      <div style="margin-top: 2rem; line-height: 1.6;">
-        {post.content}
-      </div>
+      {
+        !session ? (
+          <div class="notice">🔒 로그인이 필요합니다. 로그인 페이지로 이동 중...<br />You need to be logged in. Taking you to the login page...</div>
+        ) : error || !post ? (
+          <div class="notice">❌ 게시글을 불러올 수 없습니다.</div>
+        ) : (
+          <>
+            <h1>{post.title}</h1>
+            <p style="color: #555; font-size: 0.9rem;">
+              by {post.profiles?.name ?? '익명'} • <FormattedDate date={post.created_at} />
+            </p>
+            <img src={post.image_url || '/default.jpg'} alt="썸네일" style="max-width: 100%; margin-top: 1rem; border-radius: 8px;" />
+            <div style="margin-top: 2rem; line-height: 1.6;">
+              {post.content}
+            </div>
+          </>
+        )
+      }
     </main>
     <Footer />
   </body>

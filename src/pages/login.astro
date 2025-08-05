@@ -100,7 +100,7 @@
     </div>
 
     <script type="module">
-      import { supabase } from '../lib/supabaseClient.js';
+      import { supabase } from '../lib/supabaseBrowserClient.js';
 
       document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -109,7 +109,7 @@
         const password = document.getElementById('login-password').value;
 
         try {
-          const { error } = await supabase.auth.signInWithPassword({
+          const { data: loginData, error } = await supabase.auth.signInWithPassword({
             email,
             password
           });
@@ -117,6 +117,15 @@
           if (error) {
             alert(`❗ Login failed: ${error.message}`);
           } else {
+            // ✅ 쿠키로 저장
+            //document.cookie = `sb-vmthbmrxnkatbmtwhtxo-access-token=${loginData.session.access_token}; path=/;`;
+            //document.cookie = `sb-vmthbmrxnkatbmtwhtxo-refresh-token=${loginData.session.refresh_token}; path=/;`;
+            
+            await supabase.auth.setSession({
+              access_token: loginData.session.access_token,
+              refresh_token: loginData.session.refresh_token
+            });
+           
             alert('✅ Login successful! Redirecting...');
             window.location.href = '/';
           }

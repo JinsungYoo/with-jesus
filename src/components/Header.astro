@@ -18,7 +18,7 @@ import { SITE_TITLE } from '../consts';
   <div id="user-greeting" class="sub-header" style="display: none;"></div>
 
   <script type="module">
-    import { supabase } from '/lib/supabaseClient.js';
+    import { supabase } from '/lib/supabaseBrowserClient.js';
   
     async function checkUser() {
       const { data } = await supabase.auth.getUser();

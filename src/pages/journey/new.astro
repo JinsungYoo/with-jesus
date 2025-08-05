@@ -2,8 +2,9 @@
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import BaseHead from '../../components/BaseHead.astro';
----
 
+const { session } = Astro.props;
+---
 <html lang="ko">
   <head>
     <BaseHead title="새 글 작성" description="글과 이미지를 등록해보세요." />
@@ -41,110 +42,134 @@ import BaseHead from '../../components/BaseHead.astro';
         max-width: 100%;
         border-radius: 6px;
       }
+
+      /* 안내 메시지 스타일 */
+      .notice {
+        margin: 4rem auto;
+        padding: 2rem;
+        text-align: center;
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        border-radius: 8px;
+        max-width: 500px;
+        font-size: 1.1rem;
+      }
     </style>
   </head>
   <body>
-    <Header />
-    <main>
-      <h1>✍️ 새 글 작성</h1>
-
-      <form id="post-form">
-        <label>제목</label>
-        <input type="text" name="title" required />
-
-        <label>내용</label>
-        <textarea name="content" rows="6" required></textarea>
-
-        <label>이미지 업로드</label>
-        <input type="file" id="image-upload" accept="image/*" required />
-
-        <img id="image-preview" class="preview-img" style="display: none;" />
-
-        <button type="submit" class="btn">게시하기</button>
-      </form>
+    { !session && (
+      <>
+      <Header />
+      <main>
+      <div class="notice">🔒 로그인이 필요합니다. 로그인 페이지로 이동 중...<br />You need to be logged in. Taking you to the login page...</div>
     </main>
     <Footer />
+        <script>
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 2000);
+        </script>
+        
+      </>
+    )}
 
-    <script type="module">
-        import { supabase } from '../../lib/supabaseClient.js';
-      
-        const form = document.getElementById('post-form');
-        const imageInput = document.getElementById('image-upload');
-        const imagePreview = document.getElementById('image-preview');
-      
-        let uploadedImageUrl = '';
-      
-        // 이미지 업로드 및 미리보기
-        imageInput.addEventListener('change', async (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-      
-          // 미리보기
-          const reader = new FileReader();
-          reader.onload = () => {
-            imagePreview.src = reader.result;
-            imagePreview.style.display = 'block';
-          };
-          reader.readAsDataURL(file);
-      
-          // 파일명 생성 (충돌 방지)
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}.${fileExt}`;
-      
-          // Supabase Storage 업로드
-          const { data, error } = await supabase
-            .storage
-            .from('images')
-            .upload(fileName, file);
-      
-          if (error) {
-            alert(`이미지 업로드 실패: ${error.message}`);
-            console.error('이미지 업로드 오류:', error);
-            return;
-          }
-      
-          // 업로드 성공 시 퍼블릭 URL 가져오기
-          const { data: urlData } = supabase
-            .storage
-            .from('images')
-            .getPublicUrl(fileName);
-      
-          uploadedImageUrl = urlData.publicUrl;
-          console.log('✅ 이미지 URL:', uploadedImageUrl);
-        });
-      
-        // 폼 제출
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-      
-          const title = form.title.value;
-          const content = form.content.value;
-      
-          const { data: userData, error: userError } = await supabase.auth.getUser();
-          const user = userData.user;
-      
-          if (!user) {
-            alert("로그인이 필요합니다.");
-            return;
-          }
-      
-          const { data, error } = await supabase.from('posts').insert([
-            {
-              title,
-              content,
-              image_url: uploadedImageUrl,
-              user_id: user.id
+    { session && (
+      <>
+        <Header />
+        <main>
+          <h1>✍️ 새 글 작성</h1>
+          <form id="post-form">
+            <label>제목</label>
+            <input type="text" name="title" required />
+
+            <label>내용</label>
+            <textarea name="content" rows="6" required></textarea>
+
+            <label>이미지 업로드</label>
+            <input type="file" id="image-upload" accept="image/*" required />
+            <img id="image-preview" class="preview-img" style="display: none;" />
+
+            <button type="submit" class="btn">게시하기</button>
+          </form>
+        </main>
+        <Footer />
+
+        <script type="module">
+          import { supabase } from '../../lib/supabaseClient.js';
+
+          const form = document.getElementById('post-form');
+          const imageInput = document.getElementById('image-upload');
+          const imagePreview = document.getElementById('image-preview');
+
+          let uploadedImageUrl = '';
+
+          imageInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+              imagePreview.src = reader.result;
+              imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`;
+
+            const { data, error } = await supabase
+              .storage
+              .from('images')
+              .upload(fileName, file);
+
+            if (error) {
+              alert(`이미지 업로드 실패: ${error.message}`);
+              console.error('이미지 업로드 오류:', error);
+              return;
             }
-          ]);
-      
-          if (error) {
-            console.error('❌ 글 저장 실패:', error);
-            alert(`글 저장 실패: ${error.message || '[에러 정보 없음]'}`);
-          } else {
-            alert('✅ 게시글이 등록되었습니다!');
-            window.location.href = '/journey';
-          }
-        });
-      </script>      
+
+            const { data: urlData } = supabase
+              .storage
+              .from('images')
+              .getPublicUrl(fileName);
+
+            uploadedImageUrl = urlData.publicUrl;
+          });
+
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = form.title.value;
+            const content = form.content.value;
+
+            const { data: userData } = await supabase.auth.getUser();
+            const user = userData.user;
+
+            if (!user) {
+              alert("로그인이 필요합니다.");
+              return;
+            }
+
+            const { error } = await supabase.from('posts').insert([
+              {
+                title,
+                content,
+                image_url: uploadedImageUrl,
+                user_id: user.id
+              }
+            ]);
+
+            if (error) {
+              console.error('❌ 글 저장 실패:', error);
+              alert(`글 저장 실패: ${error.message || '[에러 정보 없음]'}`);
+            } else {
+              alert('✅ 게시글이 등록되었습니다!');
+              window.location.href = '/journey';
+            }
+          });
+        </script>
+      </>
+    )}
   </body>
 </html>

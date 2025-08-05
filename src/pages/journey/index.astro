@@ -1,25 +1,19 @@
 ---
+export const prerender = false;
+import * as JourneyPage from './index.page'; // ✅ 이거 추가
+const { props } = await JourneyPage.get(Astro); // ✅ get 실행
+const session = props?.session;
+const posts = props?.posts ?? [];
+const error = props?.error;
+
+
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 import FormattedDate from '../../components/FormattedDate.astro';
-import { supabase } from '../../lib/supabaseClient.js';
-
-const { data: posts, error } = await supabase
-  .from('posts')
-  .select(`
-    *,
-    profiles (
-      name
-    )
-  `)
-  .order('created_at', { ascending: false });
-  console.log('🔍 posts from supabase:', posts);
-if (error) {
-  console.error('❌ 포스트 불러오기 실패:', error.message);
-}
 ---
+
 
 <!doctype html>
 <html lang="en">
@@ -28,7 +22,7 @@ if (error) {
     <style>
       main {
         max-width: 800px;
-        margin: 2rem auto;
+        margin: 1rem auto;
         padding: 1rem 1.5rem;
         box-sizing: border-box;
         width: 100%; /* ✅ 추가 */
@@ -116,7 +110,7 @@ if (error) {
 
     .intro-text h1 {
       margin: 0;
-      font-size: 2rem;
+      font-size: 1rem;
     }
 
     .intro-text p {
@@ -176,36 +170,44 @@ if (error) {
   <body>
     <Header />
     <main>
-      <h1>📚 Journey Posts</h1>
+      <h3>📚 Journey Posts</h3>
       <div class="page-header">
         <div class="intro-text">          
           <p>
             예수님과 함께 걸어가는 당신의 소중한 발자국을 남겨주세요.<br />
             당신의 한걸음을 기도로 응원하겠습니다.
           </p>
+          <p> Please leave your precious footprints as you walk with Jesus.<br /> 
+            I will support your steps with prayer. 
+          </p>
         </div>
         <div class="action">
-          <a href="/journey/new" class="write-btn">글쓰기</a>
+          <a href="/journey/new" class="write-btn">Write</a>
         </div>
       </div>
       <ul>
         {
-          posts && posts.length > 0 ? posts.map((post) => (
-            <li>
-              <a href={`/journey/${post.id}/`}>
-                <img src={post.image_url || '/default.jpg'} alt="썸네일" />
-                <div class="info">
-                  <h4>{post.title}</h4>
-                  <p class="meta">by {post.profiles?.name?.slice(0, 6) ?? '익명'} • <FormattedDate date={post.created_at} /></p>
-                </div>
-              </a>
-            </li>
-          )) : (
+          posts && posts.length > 0 ? posts.map((post) => {
+            return (
+              <li>
+                <a href={`/journey/${post.id}/`}>
+                  <img src={post.image_url || '/default.jpg'} alt="썸네일" />
+                  <div class="info">
+                    <h4>{post.title}</h4>
+                    <p class="meta">
+                      by {post.profiles?.name?.slice(0, 6) ?? '익명'} • 
+                      <FormattedDate date={post.created_at} />
+                    </p>
+                  </div>
+                </a>
+              </li>
+            );
+          }) : (
             <li>아직 작성된 글이 없습니다.</li>
           )
-        }
+        }        
       </ul>
     </main>
-    <Footer />
+    <Footer />    
   </body>
 </html>
