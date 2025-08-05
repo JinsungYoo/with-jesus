@@ -1,4 +1,5 @@
 // src/pages/journey/[id].page.ts
+export const prerender = false;
 import { createServerSupabaseClient } from '../../lib/createServerSupabaseClient';
 export async function get({ request, params }: { request: Request; params: any }) {
   const supabase = createServerSupabaseClient(request); // ✅ request 객체 그대로 넘김
